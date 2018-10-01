@@ -11,7 +11,6 @@ A Python File to Input all_years of mortgage data from Freddie Mac
 import numpy as np
 import pandas as pd
 import os as os
-import feather 
 import datetime
 
 #Checking current working directory
@@ -62,12 +61,12 @@ dmort['month'] = dmort['loanDate'].dt.month
 ##STATE
 hm = set(dmort['st'])
 len(hm)
-#54 instead of 50... not good. we'll have to drop those. 
+#54 instead of 50... not good. we'll have to drop those.
 dmort = dmort[dmort['st'] != 'PR']
 dmort = dmort[dmort['st'] != 'DC']
 dmort = dmort[dmort['st'] != 'VI']
 dmort = dmort[dmort['st'] != 'GU']
-#Ahh, there we go. 
+#Ahh, there we go.
 
 #cleaning out the old time var and loan id var
 dmort = dmort[dmort.columns.drop('dt_first_pi', 'id_loan')]
@@ -81,7 +80,7 @@ dmort.head(10)
 dmort['fico'].max()
 dmort['fico'].min()
 dmort['fico'].max() - dmort['fico'].min()
-#we got some 9999 values in there for missing. let's just replace them with actual missing. 
+#we got some 9999 values in there for missing. let's just replace them with actual missing.
 dmort['fico'].sum()
 dmort['fico'] = dmort['fico'].replace(9999, None)
 #creating the new column with average fico by state
@@ -97,9 +96,7 @@ dmort['FTHB'] = dmort['flag_fthb'].astype(int)
 #creating the number of first time home buyers by state
 dmort['loan_fthb_n'] = dmort.groupby(['st'])['flag_fthb'].transform('sum')
 #creating the percentage of fthb over all loans, multiplying by 100 to be more intuitive
-dmort['fthb_perc'] = dmort['loan_fthb_n'] / dmort['loan_n'] * 100    
+dmort['fthb_perc'] = dmort['loan_fthb_n'] / dmort['loan_n'] * 100
 
 #looking at it
 dmort.head(10)
-
-
