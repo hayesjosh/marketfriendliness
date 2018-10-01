@@ -131,10 +131,14 @@ def index_tick():
     TOOLS = "pan,wheel_zoom,reset,hover,save"
 
     p = figure(
-        title="Texas Unemployment, 2009", tools=TOOLS,
+        title="Housing Market Comparison: Texas", tools=TOOLS,
         x_axis_location=None, y_axis_location=None,
         tooltips=[
-            ("Name", "@name"), ("Unemployment rate)", "@rate%"), ("(Long, Lat)", "($x, $y)")
+            ("County Name", "@name"),
+            ("Avg. Credit Score", "($x, $y)"),
+            ("Avg. Income", "@rate%"),
+            ("Avg. Home Value", "@rate%"),
+            ("Your competitiveness", "@rate%")
         ])
     p.grid.grid_line_color = None
     p.hover.point_policy = "follow_mouse"
