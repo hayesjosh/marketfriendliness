@@ -89,7 +89,7 @@ app = Flask(__name__)
 #the primary page
 @app.route('/')
 def index():
-  return render_template('index.html')
+    return render_template('index.html')
 
 
 
@@ -106,8 +106,6 @@ def index():
 @app.route('/index',methods=['GET','POST'])
 def index_tick():
     ####Request was POST, let's use that info to make a custom graph!
-
-    palette.reverse()
 
     counties = _read_data()
     counties = {
@@ -127,6 +125,7 @@ def index_tick():
         name=county_names,
         rate=county_rates,
     )
+    palette.reverse()
 
     TOOLS = "pan,wheel_zoom,reset,hover,save"
 
@@ -135,10 +134,10 @@ def index_tick():
         x_axis_location=None, y_axis_location=None,
         tooltips=[
             ("County Name", "@name"),
-            ("Avg. Credit Score", "($x, $y)"),
-            ("Avg. Income", "@rate%"),
-            ("Avg. Home Value", "@rate%"),
-            ("Your competitiveness", "@rate%")
+            # ("Avg. Credit Score", "($x, $y)"),
+            # ("Avg. Income", "@rate%"),
+            # ("Avg. Home Value", "@rate%"),
+            ("Your competitiveness in 2019", "@rate%")
         ])
     p.grid.grid_line_color = None
     p.hover.point_policy = "follow_mouse"
