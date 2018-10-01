@@ -1,5 +1,6 @@
 #importing (taken from my first flask project)
 from flask import Flask, render_template, request, redirect
+import feather
 # import requests
 # import pandas as pd
 # from bokeh.plotting import figure, output_file, show
@@ -12,7 +13,7 @@ from bokeh.io import show
 from bokeh.models import LogColorMapper
 from bokeh.palettes import Viridis6 as palette
 from bokeh.plotting import figure
-from bokeh.sampledata.us_counties import data as counties
+# from bokeh.sampledata.us_counties import data as counties
 # from bokeh.sampledata.unemployment import data as unemployment
 # ##imports done
 
