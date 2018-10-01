@@ -154,7 +154,7 @@ def index_tick():
     # # p.line(jdata['date'], jdata['close'], line_width=2)
     # script, div = components(p)
     ##sending user over to the newly made graph.html
-    return render_template('graph.html', script=script, div=div)
+    return render_template('graph.html') # script=script, div=div
 
 
 ###closing down
