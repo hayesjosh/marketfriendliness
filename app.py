@@ -60,13 +60,15 @@ def index():
 def index_tick():
     color_mapper = LogColorMapper(palette=palette)
 
+    #bringing over user input from the website
     if request.form['credit_input']:
         user_fico = request.form['credit_input']
     else:
         user_fico = 680
-
+    #using the user input in python code
     user_diff = [int(user_fico) - x for x in county_fico]
 
+    #bringing over user input from the website
     if request.form['state_input']:
         user_state = request.form['state_input']
     else:
