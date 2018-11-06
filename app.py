@@ -36,10 +36,9 @@ app = Flask(__name__)
 def index():
     return render_template('index.html')
 
-
 #on click
 @app.route('/index',methods=['GET','POST'])
-def index_tick():
+def graph():
     color_mapper = LogColorMapper(palette=palette)
     #bringing over user input from the website
     if request.form['credit_input']:
@@ -82,10 +81,16 @@ def index_tick():
     #sending user over to the newly made graph.html
     return render_template('graph.html', script=script, div=div)
 
+#the about page
+@app.route('/about')
+def about():
+    return render_template('about.html')
+
+
 ###closing down
 if __name__ == '__main__':
   #port = int(os.environ.get("PORT", 5000))
   #app.run(host='0.0.0.0', port=port)
 #  app.run(port=33507)
-  app.run(port=5000)
-  #app.run(debug=True)
+  # app.run(port=5000)
+  app.run(port=5000, debug=True)
