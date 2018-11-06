@@ -17,4 +17,4 @@ This project uses data from Freddie Mac. It is deployed on Heroku, and runs with
 
 ### Step 4: Productionalization
 - This app is available now. It is hosted on Heroku:
-    Visit it at: https://marketfriendliness.herokuapp.com/
+    - Visit it at: https://marketfriendliness.herokuapp.com/
