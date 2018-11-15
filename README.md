@@ -6,7 +6,7 @@ This is a comparison tool to empower homebuyers to find those housing markets th
 This project uses data from Freddie Mac. It is deployed on Heroku, and runs with Flask.
 
 ### Step 1: Gather, Clean, and Transform Data
-- I sample the 28 Million anonymized home loans available at http://www.freddiemac.com/research/datasets/sf_loanlevel_dataset.html
+- I sample the 26 Million anonymized home loans available at http://www.freddiemac.com/research/datasets/sf_loanlevel_dataset.html
 - This data ranges from 1991 to 2018
 
 ### Step 2: Model future competitiveness

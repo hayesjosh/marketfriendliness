@@ -33,6 +33,9 @@
               <a class="nav-link" href="/">Home<span class="sr-only">(current)</span></a>
             </li>
             <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('method') }}">About Method</a>
+            </li>
+            <li class="nav-item">
               <a class="nav-link" target="_blank" href="http://www.freddiemac.com/research/datasets/sf_loanlevel_dataset.html">Data Source</a>
             </li>
             <li class="nav-item">
@@ -68,7 +71,11 @@
           </br>
             <p>Please Enter Your:</p>
             <p>  Credit Score: <input type='text' name='credit_input' placeholder='720'></p>
-            <p>  Preferred State to View: <input type='text' name='state_input' placeholder='TX'></p>
+            <!-- <p>  Preferred State to View: <input type='text' name='state_input' placeholder='TX'></p> -->
+            <p> Preferred State to View:
+              <select name='state_dropdown'>{% for each in state_list %} <option value="{{each}}">{{each}}</option> {% endfor %} </select>
+              <p> Preferred Graph Visualization Type:
+                <select name='color_dropdown'>{% for each in color_list %} <option value="{{each}}">{{each}}</option> {% endfor %} </select>
             <p><input type="submit" value="Submit"></p>
             </form>
           </div>

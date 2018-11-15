@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="Skeleton application demoing Heroku and Flask integration.">
+    <meta name="author" content="JoshuaDHayes">
+    <!-- <link rel="icon" href="favicon.ico"> -->
+
+    <title>About Method</title>
+
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  </head>
+  <body>
+
+    <!-- navigation -->
+    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+      <div class="container">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#nav-1">
+          <span class="sr-only">Toggle navigation</span>
+          </button>
+          <span class="navbar-brand">About Method</span>
+        </div>
+        <div class="collapse navbar-collapse" id="nav-1">
+          <ul class="nav navbar-nav">
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('about') }}">|</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('index') }}">Home</a>
+            </li>
+            <li class="nav-item active">
+              <a class="nav-link" href="{{ url_for('method') }}">About Method</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="http://www.freddiemac.com/research/datasets/sf_loanlevel_dataset.html">Data Source</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('about') }}">About Josh</a>
+
+            </li>
+            </li>
+    </nav>
+
+
+
+
+
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-12 text-left">
+          <p>
+            <br></br>
+          </p>
+          <h2>Determining "Housing Market Friendliness" and How to Predict It</h2>
+          <p> One of the challenges was how to establish "market friendliness". </p>
+          <p> Another challenge is how to predict it.</p>
+          <p> Look at how messed up this data is. </p>
+         <p> That has to be accounted for.</p>
+         <p></p>
+         <br> </br>
+         <!-- <p><img src="{{url_for('static', filename='JoshPicS.jpg')}}"/></p> -->
+         <p></p>
+         <p>
+
+           Our goal is to predict FICO scores over time. Let's look at just one county at a time. I'm going to look at Alameda County.
+           <p><img src="{{url_for('static', filename='fico_over_time_alameda.png')}}"/></p>
+           Linear prediction is a straight-forward option, but visualizing it shows the weaknesses of a one-size fits all approach.
+           <p><img src="{{url_for('static', filename='linearpred_over_time_alameda.png')}}"/></p>
+           We minimized our prediction error, but in doing so created a series of predictions that are just always bad! That's not ideal.
+
+           Let's look at the correlation of lagged values to each value
+           <p><img src="{{url_for('static', filename='timecorrelation_over_time_alameda.png')}}"/></p>
+
+           Let's look at the residuals
+           <p><img src="{{url_for('static', filename='residuals_alameda.png')}}"/></p>
+           <p><img src="{{url_for('static', filename='residuals_kdensity_alameda.png')}}"/></p>
+
+           Let's compare the linear regression to the ARIMA side by side
+           <p><img src="{{url_for('static', filename='linearpred_over_time_alameda.png')}}"/></p>
+           <p><img src="{{url_for('static', filename='arimapreds_over_time_alameda.png')}}"/></p>
+           Much better.
+
+           Let's do the same thing for First-Time-Home-Buyer percentage.
+           <p><img src="{{url_for('static', filename='fthb_over_time_alameda.png')}}"/></p>
+           <p><img src="{{url_for('static', filename='linearpred_fthb_alameda.png')}}"/></p>
+           The linear prediction here is particularly attrocious. It's almost just a single, static value.
+           <p><img src="{{url_for('static', filename='timecorrelation_fthb_alameda.png')}}"/></p>
+
+
+
+           <p><img src="{{url_for('static', filename='residuals_fthb_alameda.png')}}"/></p>
+           <p><img src="{{url_for('static', filename='residuals_fthb_kdensity_alameda.png')}}"/></p>
+
+           Let's look at the two predictions side by side.
+           <p><img src="{{url_for('static', filename='linearpred_fthb_alameda.png')}}"/>
+           <img src="{{url_for('static', filename='arimapreds_fthb_alameda.png')}}"/></p>
+
+           Much better!
+
+           I ran a separate ARIMA model for FICO and FTHB for each zipcode in the United States.
+           Then I created a 6-month forecast for each zipcode.
+           Then I took the average value of that 6-month forcast and that is value imputed into the visualizations.
+
+
+
+
+
+
+
+
+
+
+           The parameters of the ARIMA model are defined as follows:
+
+           p: The number of lag observations included in the model, also called the lag order.
+           d: The number of times that the raw observations are differenced, also called the degree of differencing.
+           q: The size of the moving average window, also called the order of moving average.
+
+
+           I set up a manual grid search, to iterate through sequencial values of
+           p, d, and q.
+
+           THIS IS FOR FICO -- for Alameda
+           ARIMA(0, 0, 0) MSE=577.324
+           ARIMA(0, 0, 1) MSE=261.549
+           ARIMA(0, 0, 2) MSE=186.439
+           ARIMA(0, 1, 0) MSE=88.319
+           ARIMA(0, 1, 1) MSE=73.287
+           ARIMA(0, 1, 2) MSE=75.530
+           ARIMA(0, 2, 0) MSE=214.601
+           ARIMA(0, 2, 1) MSE=90.979
+           ARIMA(1, 0, 0) MSE=88.894
+           ARIMA(1, 0, 1) MSE=69.154
+           ARIMA(1, 0, 2) MSE=70.282
+           ARIMA(1, 1, 0) MSE=76.352
+           ARIMA(1, 1, 1) MSE=75.580
+           ARIMA(1, 1, 2) MSE=75.413
+           ARIMA(1, 2, 0) MSE=145.024
+           ARIMA(2, 0, 0) MSE=76.371
+           ARIMA(2, 1, 0) MSE=70.506
+           ARIMA(2, 1, 1) MSE=75.106
+           ARIMA(2, 1, 2) MSE=75.473
+           ARIMA(2, 2, 0) MSE=107.343
+           ARIMA(4, 0, 0) MSE=69.641
+           ARIMA(4, 1, 0) MSE=72.164
+           ARIMA(4, 1, 1) MSE=77.143
+           ARIMA(4, 2, 0) MSE=84.936
+           ARIMA(4, 2, 1) MSE=76.235
+           ARIMA(6, 0, 0) MSE=71.253
+           ARIMA(6, 0, 1) MSE=71.467
+           ARIMA(6, 1, 0) MSE=74.786
+           ARIMA(6, 1, 1) MSE=77.660
+           ARIMA(6, 1, 2) MSE=80.457
+           ARIMA(6, 2, 0) MSE=84.007
+           ARIMA(6, 2, 1) MSE=79.187
+           ARIMA(8, 0, 0) MSE=72.040
+           ARIMA(8, 0, 1) MSE=71.974
+
+           ARIMA(1, 0, 0) MSE=88.894
+           ARIMA(1, 0, 1) MSE=69.154
+           ARIMA(1, 1, 0) MSE=76.352
+           ARIMA(1, 1, 1) MSE=75.580
+           ARIMA(2, 0, 0) MSE=76.371
+           ARIMA(2, 1, 0) MSE=70.506
+           ARIMA(2, 1, 1) MSE=75.106
+           ARIMA(5, 0, 0) MSE=69.604
+           ARIMA(5, 1, 0) MSE=74.536
+           ARIMA(5, 1, 1) MSE=79.802
+           ARIMA(7, 0, 0) MSE=71.506
+           ARIMA(7, 0, 1) MSE=71.581
+           ARIMA(7, 1, 0) MSE=75.943
+           ARIMA(7, 1, 1) MSE=75.904
+           ARIMA(9, 0, 0) MSE=71.983
+           ARIMA(9, 1, 0) MSE=76.798
+           Best ARIMA(1, 0, 1) MSE=69.154
+
+           THIS IS FOR FTHB -- For Alameda
+           ARIMA(1, 0, 0) MSE=0.003
+           ARIMA(1, 0, 1) MSE=0.002
+           ARIMA(1, 1, 0) MSE=0.003
+           ARIMA(1, 1, 1) MSE=0.003
+           ARIMA(1, 1, 2) MSE=0.003
+           ARIMA(1, 2, 0) MSE=0.006
+           ARIMA(2, 0, 0) MSE=0.003
+           ARIMA(2, 0, 1) MSE=0.003
+           ARIMA(2, 0, 2) MSE=0.002
+           ARIMA(2, 1, 0) MSE=0.003
+           ARIMA(2, 1, 1) MSE=0.003
+           ARIMA(2, 1, 2) MSE=0.003
+           ARIMA(2, 2, 0) MSE=0.005
+           ARIMA(3, 0, 0) MSE=0.003
+           ARIMA(3, 0, 2) MSE=0.002
+           ARIMA(3, 1, 0) MSE=0.003
+           ARIMA(3, 2, 0) MSE=0.005
+           Best ARIMA(2, 0, 2) MSE=0.002
+
+           Then I repeated this process for a few counties to make sure the process was generalizable.
+
+
+           Using the ARIMA model, for each county, I create a 6-month forecast for values.
+           Then I take the mean of those values. This is the 'predicted value' shown on visualizations.
+
+         </p>
+         <p></p>
+         <p></p>
+         <p></p>
+
+        </div>
+      </div>
+    </div>
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  </body>
+</html>
