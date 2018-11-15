@@ -47,7 +47,7 @@
       <div class="row">
         <div class="col-lg-12 text-left">
           <br></br>
-          <p><h3>Welcome to the:</p>
+          <p><h3>Welcome to the</p>
             <p> Housing Market Predictor and Assessment Tool</h3> </p>
           <ul>
           </ul>
@@ -60,20 +60,20 @@
           <div class="col-lg-12 text-left">
             <form id='input' method='post' action='index'>
               <ul style="list-style-type:disc">
-            <li>Inspired by the interactive visualizations that allow you to see the past <a target="_blank" href="https://project.wnyc.org/median-income-nation/#6/37.388/-119.773"> income differences across region</a>, this project allows you to visually assess the <b>future</b> competitiveness of housing markets.</li>
+            <li>Inspired by the interactive visualizations that allow you to see past <a target="_blank" href="https://project.wnyc.org/median-income-nation/#6/37.388/-119.773"> income differences across region</a>, this project allows you to visually assess the <b>future</b> competitiveness of housing markets.</li>
             <li>Comparisons can then be made against these predicted values based on the user's specific values for FICO (credit) score and specific area of interest.</li>
-            <li>The data that powers this application comes from 26-Million anonymized Freddie Mac home loans between 1991-2018. </li>
+            <li>The data that powers this application comes from 26-million anonymized Freddie Mac home loans between 1991-2018. </li>
             <li>Samples of these home loans are aggregated across regions, and future values are estimated based upon a time series analysis employing region-specific Autoregressive Integrated Moving Average (ARIMA) models.</li>
           </ul>
 
             <br>
           </br>
             <p>Please Enter Your:</p>
-            <p>  Credit Score: <input type='text' name='credit_input' placeholder='720'></p>
+            <p>Credit Score: <input type='text' name='credit_input' placeholder='720'></p>
             <!-- <p>  Preferred State to View: <input type='text' name='state_input' placeholder='TX'></p> -->
-            <p> Preferred State to View:
+            <p>Preferred State to View:
               <select name='state_dropdown'>{% for each in state_list %} <option value="{{each}}">{{each}}</option> {% endfor %} </select>
-              <p> Preferred Graph Visualization Type:
+            <p>Preferred Graph Visualization Type:
                 <select name='color_dropdown'>{% for each in color_list %} <option value="{{each}}">{{each}}</option> {% endfor %} </select>
             <p><input type="submit" value="Submit"></p>
             <br>  </br>

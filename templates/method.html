@@ -56,21 +56,21 @@
             <br></br>
           </p>
           <h3>How do we measure housing market "competitiveness"? And then how do we predict it?</h3>
-          <p> One of the challenges was how to compare housing markets. </p>
+          <p> One of the challenges is how to compare housing markets. </p>
           <p> Another challenge is how to predict it.</p>
           <p> Freddie Mac released a trove of data, but it is not immediately apparent what to do with that information.</p>
-          <p> Of the ~30 data points on each loan, a few features stood out as particularly informative:
+          <p> Of the ~30 data points on each loan, a few features stand out as particularly informative:
             <ul>
               <li>FICO score</li>
               <li>loan origination date</li>
               <li>first-time home-buyer flag</li>
-              <li>zipcode</li>
+              <li>zip code</li>
             </ul>
 
           <p> Of course, none of that is clean or ready to use. FICO score has odd inputations,
             loan date has to be turned to datetime, and first-time home-buyer has numerous categories
-            that one has to decide how to code. But perhaps most vexingly, is that zipcodes do not map well.
-            We will need to "crosswalk" zipcodes over to counties to take advantage of pre-existing mapping options.
+            that one has to decide how to code. But perhaps most vexingly, is that zip codes do not map well.
+            We need to "crosswalk" zip codes over to counties to take advantage of pre-existing mapping options.
           </p>
           <p> To define "competitiveness," we use:
             <ul>
@@ -85,9 +85,9 @@
          <p></p>
          <p>
 
-           As an example, one of our goals is to predict FICO scores over time. Let's look at just one zipcode to get an idea of what sorts of distributions we will have to confront.
+           As an example, one of our goals is to predict FICO scores over time. Let's look at just one zip code to get an idea of what sorts of distributions we have to confront.
          </p>
-         <p> I'm going to look at Alameda County.</p>
+         <p> For now, let's look at Alameda's zip codes. Freddie Mac collapses specific zip codes to try to anonymize the loanholders, so let's start with the zip codes that begin with "945" (i.e. 94501 and 94502 collapsed together).</p>
            <p><img src="{{url_for('static', filename='fico_over_time_alameda.png')}}"/></p>
            <p></p>
            <br> </br>
@@ -107,7 +107,7 @@
 
            Linear prediction is a straight-forward option, but visualizing it shows the weaknesses of such a 'one-size fits all' approach.
            <p><img src="{{url_for('static', filename='linearpred_over_time_alameda.png')}}"/></p>
-           Our linear prediction minimized its prediction error, but in doing so it created a series of predictions that are just <b>always</b> bad! That's really not ideal.
+           Our linear prediction minimizes its prediction error, but in doing so it creates a series of predictions that are just <b>always</b> bad! That's not ideal.
 
            <p>Instead, we want our predictions to be more contextualized.
              We want to look at the recent history of a housing market and then make an informed prediction about its future.
@@ -117,19 +117,16 @@
            There is a lot going on there!
            <br> Let's make an Autoregressive Integrated Moving Average (ARIMA) model to take advantage of how these lagged values can better guide our predictions of future values.</br>
 
-
-
-            <br>The parameters of the ARIMA model are defined as follows:</br>
+            <br>The hyperparameters of the ARIMA model are defined as follows:</br>
            <li><b>p</b>: The number of lag observations included in the model, also called the lag order.</li>
            <li><b>d</b>: The number of times that the raw observations are differenced, also called the degree of differencing.</li>
            <li><b>q</b>: The size of the moving average window, also called the order of moving average.</li>
 
+            <br>I set up a manual grid search to iterate through sequencial values of p, d, and q.</br>
+            <p>(You can see the values of the grid search at the <a href="#gridsearch">bottom</a> of this page.)</p>
 
-            <br>I set up a manual grid search, to iterate through sequencial values of p, d, and q.</br>
-            <p>(You can see the values of the grid search at the bottom of this page.)</p>
 
-
-           <p>Here are the residuals to that ARIMA model, which can be insightful as to whether there are over time trends or pattern-like repitition ("seasonality") in our data.</p>
+           <p>Here are the residuals to that ARIMA model, which can be insightful as to whether there is over-time trends or pattern-like repetition ("seasonality") in our data.</p>
            <p><img src="{{url_for('static', filename='residuals_alameda.png')}}"/> <img src="{{url_for('static', filename='residuals_kdensity_alameda.png')}}"/></p>
 
            <b>Let's compare that original linear regression to our new ARIMA model side by side</b>:
@@ -152,12 +149,12 @@
            <p></p>
            Here is the order of my workflow to create future values for each county:
            <ul>
-           <li>Within each of the ~800 zipcode-categories across the United States, I ran a separate ARIMA model for FICO and FTHB.</li>
-           <li>I manually coded a grid search to evaluate the ARIMA fit and tested it on randomly chosen zipcodes to identify the most generalizable hyperparameters.</li>
-           <li>Both zipcode-specific models created a 6-month forecast for its zipcode.</li>
-           <li>I took the average of that 6-month forcast as that zipcode's 'future value'.</li>
-           <li>Cross-walked zipcode values into county-wide values.</li>
-          <li>Loaded county-values into an interactive visualization.</li>
+           <li>Within each of the ~800 zip codes across the United States, I ran a separate ARIMA model for FICO and FTHB.</li>
+           <li>I manually coded a grid search to evaluate the ARIMA fit and tested it on randomly chosen zip codes to identify the most generalizable hyperparameters.</li>
+           <li>Both zip code-specific models created a 6-month forecast for its zip code.</li>
+           <li>I took the average of that 6-month forcast as that zip code's 'future value'.</li>
+           <li>Cross-walked zip code values into county-wide values.</li>
+           <li>Loaded county values into an interactive visualization.</li>
         </ul>
 
 
@@ -169,6 +166,7 @@
           <br> </br>
           <p></p>
 
+                    <a name="gridsearch"></a>
             <p></p>
             <br> </br>
             <p></p>
@@ -215,7 +213,7 @@
            <p>ARIMA(3, 2, 0) MSE=0.005</p>
            <p>Best ARIMA(2, 0, 2) MSE=0.002</p>
 
-           <br>Remember that these values are for just one zipcode. To make sure I didn't overfit my models because of hyperparameters that only worked on one zipcode, I chose a few at random and repeated the process.</br>
+           <br>Remember that these values are for just one zip code. To make sure I didn't overfit my models because of hyperparameters that only worked on one zip code, I chose a few at random and repeated the process.</br>
 
          </p>
          <p></p>
