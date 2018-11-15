@@ -56,18 +56,26 @@
             <br></br>
           </p>
           <h2>Determining "Housing Market Friendliness" and How to Predict It</h2>
-          <p> One of the challenges was how to establish "market friendliness". </p>
+          <p> One of the challenges was how to compare housing markets. </p>
           <p> Another challenge is how to predict it.</p>
-          <p> Look at how messed up this data is. </p>
-         <p> That has to be accounted for.</p>
+          <p> The data is incredibly varied... and we have to account for that.  </p>
+
          <p></p>
          <br> </br>
-         <!-- <p><img src="{{url_for('static', filename='JoshPicS.jpg')}}"/></p> -->
          <p></p>
          <p>
 
            Our goal is to predict FICO scores over time. Let's look at just one county at a time. I'm going to look at Alameda County.
            <p><img src="{{url_for('static', filename='fico_over_time_alameda.png')}}"/></p>
+           <p></p>
+           <br> </br>
+           <p></p>
+           <p>
+             <p></p>
+             <br> </br>
+             <p></p>
+             <p>
+
            Linear prediction is a straight-forward option, but visualizing it shows the weaknesses of a one-size fits all approach.
            <p><img src="{{url_for('static', filename='linearpred_over_time_alameda.png')}}"/></p>
            We minimized our prediction error, but in doing so created a series of predictions that are just always bad! That's not ideal.
