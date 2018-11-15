@@ -7,7 +7,7 @@
     <meta name="author" content="JoshuaDHayes">
     <!-- <link rel="icon" href="favicon.ico"> -->
 
-    <title>Housing Market Comparison Tool: About Method</title>
+    <title>Housing Market Predictor and Assessment Tool: About Method</title>
 
     <!-- Bootstrap core CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
@@ -27,7 +27,7 @@
         <div class="collapse navbar-collapse" id="nav-1">
           <ul class="nav navbar-nav">
             <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('about') }}">|</a>
+              <a class="nav-link" href="{{ url_for('method') }}">|</a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="{{ url_for('index') }}">Home</a>
@@ -55,50 +55,84 @@
           <p>
             <br></br>
           </p>
-          <h2>Determining "Housing Market Friendliness" and How to Predict It</h2>
+          <h2>How do we measure housing market "competitiveness"? And then how do we predict it?</h2>
           <p> One of the challenges was how to compare housing markets. </p>
           <p> Another challenge is how to predict it.</p>
-          <p> The data is incredibly varied... and we have to account for that.  </p>
+          <p> Freddie Mac released a trove of data, but it is not immediately apparent what to do with that information.</p>
+          <p> Of the ~30 data points on each loan, a few features stood out as particularly informative:
+            <ul>
+              <li>FICO score</li>
+              <li>loan origination date</li>
+              <li>first-time home-buyer flag</li>
+              <li>zipcode</li>
+            </ul>
+
+          <p> Of course, none of that is clean or ready to use. FICO score has odd inputations,
+            loan date has to be turned to datetime, and first-time home-buyer has numerous categories
+            that one has to decide how to code. But perhaps most vexingly, is that zipcodes do not map well.
+            We will need to "crosswalk" zipcodes over to counties to take advantage of pre-existing mapping options.
+          </p>
+          <p> To define "competitiveness," we use:
+            <ul>
+              <li><b> FICO score</b>: As FICO scores increase in a region, that region becomes more competitive. </li>
+              <li><b> First-time home-buyer (FTHB) percentage</b>: FTHB's tend to be less empowered buyers. Where the relative percentage of FTHB are higher, we can assume that housing market is less competitive.</li>
+            </ul>
+          <p> As for predicting future values, we have challenges there too.</p>
+          <p> Our two key features are vexingly varied... and if we do not account for that variability then our predictions will be essentially meaningless.  </p>
 
          <p></p>
          <br> </br>
          <p></p>
          <p>
 
-           Our goal is to predict FICO scores over time. Let's look at just one county at a time. I'm going to look at Alameda County.
+           As an example, one of our goals is to predict FICO scores over time. Let's look at just one zipcode to get an idea of what sorts of distributions we will have to confront.
+         </p>
+         <p> I'm going to look at Alameda County.</p>
            <p><img src="{{url_for('static', filename='fico_over_time_alameda.png')}}"/></p>
            <p></p>
            <br> </br>
            <p></p>
-           <p>
+
              <p></p>
              <br> </br>
              <p></p>
-             <p>
+
                <p></p>
                <br> </br>
                <p></p>
-               <p>
+
                  <p></p>
                  <br> </br>
                  <p></p>
-                 <p>
-                   <p></p>
-                   <br> </br>
-                   <p></p>
-                   <p>
 
-           Linear prediction is a straight-forward option, but visualizing it shows the weaknesses of a one-size fits all approach.
+           Linear prediction is a straight-forward option, but visualizing it shows the weaknesses of such a 'one-size fits all' approach.
            <p><img src="{{url_for('static', filename='linearpred_over_time_alameda.png')}}"/></p>
-           We minimized our prediction error, but in doing so created a series of predictions that are just always bad! That's not ideal.
+           Our linear prediction minimized its prediction error, but in doing so it created a series of predictions that are just <b>always</b> bad! That's really not ideal.
 
-           Let's look at the correlation of lagged values to each value
+           <p>Instead, we want our predictions to be more contextualized.
+             We want to look at the recent history of a housing market and then make an informed prediction about its future.
+             What we want is a time series. Time series incorporate the recent past (or "lagged data points") into analyses and predictions.
+             Let's look at the correlation between each value and that value's lagged values.</p>
            <p><img src="{{url_for('static', filename='timecorrelation_over_time_alameda.png')}}"/></p>
+           There is a lot going on there!
+           <br> Let's make an ARIMA model to take advantage of how these lagged values can better guide our predictions of future values.</br>
 
-           Let's look at the residuals
+
+
+            <br>The parameters of the ARIMA model are defined as follows:</br>
+           <li><b>p</b>: The number of lag observations included in the model, also called the lag order.</li>
+           <li><b>d</b>: The number of times that the raw observations are differenced, also called the degree of differencing.</li>
+           <li><b>q</b>: The size of the moving average window, also called the order of moving average.</li>
+
+
+            <br>I set up a manual grid search, to iterate through sequencial values of p, d, and q.</br>
+            <p>(You can see the values of the grid search at the bottom of this page.)</p>
+
+
+           <p>Here are the residuals to that ARIMA model, which can be insightful as to whether there are over time trends or pattern-like repitition ("seasonality") in our data.</p>
            <p><img src="{{url_for('static', filename='residuals_alameda.png')}}"/> <img src="{{url_for('static', filename='residuals_kdensity_alameda.png')}}"/></p>
 
-           Let's compare the linear regression to the ARIMA side by side
+           <b>Let's compare that original linear regression to our new ARIMA model side by side</b>:
            <p><img src="{{url_for('static', filename='linearpred_over_time_alameda.png')}}"/> <img src="{{url_for('static', filename='arimapreds_over_time_alameda.png')}}"/></p>
            Much better!
 
@@ -110,114 +144,78 @@
            Let's check out the lagged correlations, build our ARIMA model and look at its residuals.
            <p><img src="{{url_for('static', filename='timecorrelation_fthb_alameda.png')}}"/> <img src="{{url_for('static', filename='residuals_fthb_alameda.png')}}"/> <img src="{{url_for('static', filename='residuals_fthb_kdensity_alameda.png')}}"/></p>
 
-           Let's look at the two predictions side by side.
+           Let's look at these two predictions side by side.
            <p><img src="{{url_for('static', filename='linearpred_fthb_alameda.png')}}"/>
            <img src="{{url_for('static', filename='arimapreds_fthb_alameda.png')}}"/></p>
 
            <br>Much better!</br>
-
-           <br>I ran a separate ARIMA model for FICO and FTHB for each zipcode in the United States.</br>
-           <br>Then I created a 6-month forecast for each zipcode.</br>
-           <br>Then I took the average value of that 6-month forcast and that is value imputed into the visualizations.</br>
-
-
-
-
-
-
-
-
+           <p></p>
+           Here is the order of my workflow to create future values for each county:
+           <ul>
+           <li>Within each of the ~800 zipcode-categories across the United States, I ran a separate ARIMA model for FICO and FTHB.</li>
+           <li>I manually coded a grid search to evaluate the ARIMA fit and tested it on randomly chosen zipcodes to identify the most generalizable hyperparameters.</li>
+           <li>Both zipcode-specific models created a 6-month forecast for its zipcode.</li>
+           <li>I took the average of that 6-month forcast as that zipcode's 'future value'.</li>
+           <li>Cross-walked zipcode values into county-wide values.</li>
+          <li>Loaded county-values into an interactive visualization.</li>
+        </ul>
 
 
-           <br>The parameters of the ARIMA model are defined as follows:</br>
+        <p></p>
+        <br> </br>
+        <p></p>
 
-          <br> p: The number of lag observations included in the model, also called the lag order.</br>
-          <br> d: The number of times that the raw observations are differenced, also called the degree of differencing.</br>
-          <br> q: The size of the moving average window, also called the order of moving average.</br>
+          <p></p>
+          <br> </br>
+          <p></p>
 
-
-           <br>I set up a manual grid search, to iterate through sequencial values of</br>
-           <br>p, d, and q.</br>
-
-           <br>THIS IS FOR FICO -- for Alameda</br>
-           <br>ARIMA(0, 0, 0) MSE=577.324</br>
-           <br>ARIMA(0, 0, 1) MSE=261.549</br>
-           <br>ARIMA(0, 0, 2) MSE=186.439</br>
-           <br>ARIMA(0, 1, 0) MSE=88.319</br>
-           <br>ARIMA(0, 1, 1) MSE=73.287</br>
-           <br>ARIMA(0, 1, 2) MSE=75.530</br>
-           <br>ARIMA(0, 2, 0) MSE=214.601</br>
-           <br>ARIMA(0, 2, 1) MSE=90.979</br>
-           <br>ARIMA(1, 0, 0) MSE=88.894</br>
-           <br>ARIMA(1, 0, 1) MSE=69.154</br>
-           <br>ARIMA(1, 0, 2) MSE=70.282</br>
-           <br>ARIMA(1, 1, 0) MSE=76.352</br>
-           <br>ARIMA(1, 1, 1) MSE=75.580</br>
-           <br>ARIMA(1, 1, 2) MSE=75.413</br>
-           <br>ARIMA(1, 2, 0) MSE=145.024</br>
-           <br>ARIMA(2, 0, 0) MSE=76.371</br>
-           <br>ARIMA(2, 1, 0) MSE=70.506</br>
-           <br>ARIMA(2, 1, 1) MSE=75.106</br>
-           <br>ARIMA(2, 1, 2) MSE=75.473</br>
-           <br>ARIMA(2, 2, 0) MSE=107.343</br>
-           <br>ARIMA(4, 0, 0) MSE=69.641</br>
-           <br>ARIMA(4, 1, 0) MSE=72.164</br>
-           <br>ARIMA(4, 1, 1) MSE=77.143</br>
-           <br>ARIMA(4, 2, 0) MSE=84.936</br>
-           <br>ARIMA(4, 2, 1) MSE=76.235</br>
-           <br>ARIMA(6, 0, 0) MSE=71.253</br>
-           <br>ARIMA(6, 0, 1) MSE=71.467</br>
-           <br>ARIMA(6, 1, 0) MSE=74.786</br>
-           <br>ARIMA(6, 1, 1) MSE=77.660</br>
-           <br>ARIMA(6, 1, 2) MSE=80.457</br>
-           <br>ARIMA(6, 2, 0) MSE=84.007</br>
-           <br>ARIMA(6, 2, 1) MSE=79.187</br>
-           <br>ARIMA(8, 0, 0) MSE=72.040</br>
-           <br>ARIMA(8, 0, 1) MSE=71.974</br>
-
-           <br>ARIMA(1, 0, 0) MSE=88.894</br>
-           <br>ARIMA(1, 0, 1) MSE=69.154</br>
-           <br>ARIMA(1, 1, 0) MSE=76.352</br>
-           <br>ARIMA(1, 1, 1) MSE=75.580</br>
-           <br>ARIMA(2, 0, 0) MSE=76.371</br>
-           <br>ARIMA(2, 1, 0) MSE=70.506</br>
-           <br>ARIMA(2, 1, 1) MSE=75.106</br>
-           <br>ARIMA(5, 0, 0) MSE=69.604</br>
-           <br>ARIMA(5, 1, 0) MSE=74.536</br>
-           <br>ARIMA(5, 1, 1) MSE=79.802</br>
-           <br>ARIMA(7, 0, 0) MSE=71.506</br>
-           <br>ARIMA(7, 0, 1) MSE=71.581</br>
-           <br>ARIMA(7, 1, 0) MSE=75.943</br>
-           <br>ARIMA(7, 1, 1) MSE=75.904</br>
-           <br>ARIMA(9, 0, 0) MSE=71.983</br>
-           <br>ARIMA(9, 1, 0) MSE=76.798</br>
-           <br>Best ARIMA(1, 0, 1) MSE=69.154</br>
-
-           <br>THIS IS FOR FTHB -- For Alameda</br>
-           <br>ARIMA(1, 0, 0) MSE=0.003</br>
-           <br>ARIMA(1, 0, 1) MSE=0.002</br>
-           <br>ARIMA(1, 1, 0) MSE=0.003</br>
-           <br>ARIMA(1, 1, 1) MSE=0.003</br>
-           <br>ARIMA(1, 1, 2) MSE=0.003</br>
-           <br>ARIMA(1, 2, 0) MSE=0.006</br>
-           <br>ARIMA(2, 0, 0) MSE=0.003</br>
-           <br>ARIMA(2, 0, 1) MSE=0.003</br>
-           <br>ARIMA(2, 0, 2) MSE=0.002</br>
-           <br>ARIMA(2, 1, 0) MSE=0.003</br>
-           <br>ARIMA(2, 1, 1) MSE=0.003</br>
-           <br>ARIMA(2, 1, 2) MSE=0.003</br>
-           <br>ARIMA(2, 2, 0) MSE=0.005</br>
-           <br>ARIMA(3, 0, 0) MSE=0.003</br>
-           <br>ARIMA(3, 0, 2) MSE=0.002</br>
-           <br>ARIMA(3, 1, 0) MSE=0.003</br>
-           <br>ARIMA(3, 2, 0) MSE=0.005</br>
-           <br>Best ARIMA(2, 0, 2) MSE=0.002</br>
-
-           <br>Then I repeated this process for a few counties to make sure the process was generalizable.</br>
+            <p></p>
+            <br> </br>
+            <p></p>
 
 
-           <br>Using the ARIMA model, for each county, I create a 6-month forecast for values.</br>
-           <br>Then I take the mean of those values. This is the 'predicted value' shown on visualizations.</br>
+
+           <p><b>Grid Search results for FICO</b></p>
+           <p>ARIMA(0, 0, 0) MSE=577.324</p>
+           <p>ARIMA(0, 0, 1) MSE=261.549</p>
+           <p>ARIMA(0, 0, 2) MSE=186.439</p>
+           <p>ARIMA(0, 1, 0) MSE=88.319</p>
+           <p>ARIMA(0, 1, 1) MSE=73.287</p>
+           <p>ARIMA(0, 1, 2) MSE=75.530</p>
+           <p>ARIMA(0, 2, 0) MSE=214.601</p>
+           <p>ARIMA(0, 2, 1) MSE=90.979</p>
+           <p>ARIMA(1, 0, 0) MSE=88.894</p>
+           <p> ... </p>
+           <p>ARIMA(8, 0, 1) MSE=71.974</p>
+           <p>ARIMA(9, 0, 0) MSE=71.983</p>
+           <p>ARIMA(9, 1, 0) MSE=76.798</p>
+           <p>Best ARIMA(1, 0, 1) MSE=69.154</p>
+           <p></p>
+           <br> </br>
+           <p></p>
+
+             <p></p>
+             <br> </br>
+             <p></p>
+
+
+           <p><b>Grid Search results for FTHB</b></p>
+           <p>ARIMA(1, 0, 0) MSE=0.003</p>
+           <p>ARIMA(1, 0, 1) MSE=0.002</p>
+           <p>ARIMA(1, 1, 0) MSE=0.003</p>
+           <p>ARIMA(1, 1, 1) MSE=0.003</p>
+           <p>ARIMA(1, 1, 2) MSE=0.003</p>
+           <p>ARIMA(1, 2, 0) MSE=0.006</p>
+           <p>ARIMA(2, 0, 0) MSE=0.003</p>
+           <p>ARIMA(2, 0, 1) MSE=0.003</p>
+           <p> ... </p>
+           <p>ARIMA(3, 0, 0) MSE=0.003</p>
+           <p>ARIMA(3, 0, 2) MSE=0.002</p>
+           <p>ARIMA(3, 1, 0) MSE=0.003</p>
+           <p>ARIMA(3, 2, 0) MSE=0.005</p>
+           <p>Best ARIMA(2, 0, 2) MSE=0.002</p>
+
+           <br>Remember that these values are for just one zipcode. To make sure I didn't overfit my models because of hyperparameters that only worked on one zipcode, I chose a few at random and repeated the process.</br>
 
          </p>
          <p></p>
