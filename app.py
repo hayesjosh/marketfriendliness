@@ -1,13 +1,7 @@
-#importing (taken from my first flask project)
 from flask import Flask, render_template, request, redirect
 import os
 import pickle
 import csv
-# import feather
-# import requests
-# import pandas as pd
-
-# #importing (taken from bokeh county-map template)
 from bokeh.plotting import figure, output_file, show
 from bokeh.embed import components
 from bokeh.io import show
@@ -16,40 +10,13 @@ from bokeh.palettes import YlGn9  as fthb_palette
 from bokeh.palettes import Reds9 as fico_palette
 from bokeh.palettes import RdBu10 as fico_diff_palette
 from bokeh.plotting import figure
-# import xml.etree.cElementTree as et
 
 fthb_palette.reverse()
 fico_palette.reverse()
 fico_diff_palette.reverse()
 
-
-
-# with open('data/county_names.p', 'rb') as fp:
-#     county_names = pickle.load(fp)
-# with open('data/county_xs.p', 'rb') as fp:
-#     county_xs = pickle.load(fp)
-# with open('data/county_ys.p', 'rb') as fp:
-#     county_ys = pickle.load(fp)
-# with open('data/county_fico.p', 'rb') as fp:
-#     county_fico = pickle.load(fp)
-# with open('data/county_fthb.p', 'rb') as fp:
-#     county_fthb = pickle.load(fp)
-#
-#
-# #bringing in the appropriate files based on the user input
-# objects_list = ['county_names','county_xs','county_ys','county_fico','county_fthb']
-#
 with open('data/graph_data.p', 'rb') as fp:
     graph_data = pickle.load(fp)
-#
-#
-
-
-
-
-
-
-
 
 #starting up our app
 app = Flask(__name__)
@@ -66,12 +33,12 @@ def index():
 @app.route('/index',methods=['GET','POST'])
 def graph():
     #bringing over user input from the website
-
     if request.form.get('state_dropdown'):
         user_state2 = request.form.get('state_dropdown')
     else:
         user_state2 = "TX"
 
+    #getting appropriate data
     state_data = graph_data[user_state2]
     county_names = state_data[0]
     county_xs= state_data[1]
@@ -93,8 +60,7 @@ def graph():
     else:
         graph_type = "fico"
 
-
-
+    #building dict for graphing
     data=dict(
         x=county_xs,
         y=county_ys,
@@ -106,6 +72,7 @@ def graph():
 
     TOOLS = "pan,wheel_zoom,reset,hover,save"
 
+#DIFFERENT GRAPH TYPES BELOW
     if graph_type == 'fico':
         min_value = min(county_fico)
         max_value = max(county_fico)
